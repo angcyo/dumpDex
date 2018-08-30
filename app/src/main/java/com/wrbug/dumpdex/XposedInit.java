@@ -20,7 +20,6 @@ import de.robv.android.xposed.callbacks.XC_LoadPackage;
  */
 public class XposedInit implements IXposedHookLoadPackage {
 
-
     public static void log(String txt) {
 
         XposedBridge.log("dumpdex-> " + txt);
@@ -36,13 +35,18 @@ public class XposedInit implements IXposedHookLoadPackage {
     @Override
     public void handleLoadPackage(final XC_LoadPackage.LoadPackageParam lpparam) {
         PackerInfo.Type type = PackerInfo.find(lpparam);
+
+        RLog.saveToSDCard("Find:" + lpparam.packageName + ":" + type);
+
         if (type == null) {
             return;
         }
-        final String packageName = lpparam.packageName;
+        final String packageName = lpparam.packageName;//"cn.mengbb8.live";//lpparam.packageName;
         if (lpparam.packageName.equals(packageName)) {
             String path = "/data/data/" + packageName + "/dump";
             File parent = new File(path);
+
+            RLog.saveToSDCard(this.hashCode() + "Hook:" + packageName + ":" + path);
             if (!parent.exists() || !parent.isDirectory()) {
                 parent.mkdirs();
             }
@@ -50,7 +54,7 @@ public class XposedInit implements IXposedHookLoadPackage {
             if (DeviceUtils.isOreo()) {
                 OreoDump.init(lpparam);
             } else {
-                LowSdkDump.init(lpparam,type);
+                LowSdkDump.init(lpparam, type);
             }
 
         }
